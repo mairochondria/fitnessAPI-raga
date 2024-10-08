@@ -53,7 +53,7 @@ module.exports.getAllActive = (req, res) => {
 };
 
 module.exports.getProduct = (req, res) => {
-	return Product.findById(req.params.id)
+	return Product.findById(req.params.productId)
 		.then((product) => {
 			if (!product) {
 				return res.status(404).send({message: "Course not found"});
