@@ -1,118 +1,80 @@
-const User = require("../models/User");
+module.exports.registerUser = async (req, res) => {
+	try {
+		const { firstName, lastName, email, mobileNo, password, isAdmin } = req.body;
+		
+		// Validations
+		if (mobileNo.length !== 11) return res.status(400).send({ error: "Mobile number is invalid" });
+		if (!email.includes("@")) return res.status(400).send({ error: "Email invalid" });
+		if (password.length < 8) return res.status(400).send({ error: "Password must be at least 8 characters long" });
 
-const bcrypt = require("bcryptjs");
-const auth = require("../auth");
+		// Create new user
+		const hashedPassword = bcrypt.hashSync(password, 10);
+		const newUser = new User({ firstName, lastName, email, mobileNo, password: hashedPassword, isAdmin });
 
-const {errorHandler} = require("../auth");
-
-module.exports.registerUser = (req, res) => {
-	if (req.body.mobileNo.length !== 11) {
-		return res.status(400).send({error: "Mobile number is invalid"});
-	}
-
-	if (!req.body.email.includes("@")) {
-		return res.status(400).send({error: "Email invalid"});
-	}
-
-	if (req.body.password.length < 8) {
-		return res
-			.status(400)
-			.send({error: "Password must be at least 8 characters long"});
-	}
-
-	let newUser = new User({
-		firstName: req.body.firstName,
-		lastName: req.body.lastName,
-		email: req.body.email,
-		mobileNo: req.body.mobileNo,
-		password: bcrypt.hashSync(req.body.password, 10),
-		isAdmin: req.body.isAdmin,
-	});
-
-	newUser
-		.save()
-		.then((result) => {
-			return res.status(201).send({
-				message: "Registered successfully"
-			});
-		})
-		.catch((error) => errorHandler(error, req, res));
-};
-
-module.exports.loginUser = (req, res) => {
-	if (req.body.email.includes("@")) {
-		return User.findOne({email: req.body.email})
-			.then((result) => {
-				if (result === null) {
-					return res.status(404).send({error: "No email found"});
-				} else {
-					const isPasswordCorrect = bcrypt.compareSync(
-						req.body.password,
-						result.password
-					);
-					if (isPasswordCorrect) {
-						return res.status(200).send({
-							access: auth.createAccessToken(result),
-						});
-					} else {
-						return res
-							.status(401)
-							.send({error: "Email and password do not match"});
-					}
-				}
-			})
-			.catch((error) => errorHandler(error, req, res));
-	} else {
-		return res.status(400).send({error: "Invalid email"});
+		await newUser.save();
+		return res.status(201).send({ message: "Registered successfully" });
+	} catch (error) {
+		return errorHandler(error, req, res);
 	}
 };
 
+module.exports.loginUser = async (req, res) => {
+	try {
+		const { email, password } = req.body;
 
-module.exports.getProfile = (req, res) => {
-	return User.findById(req.user.id)
-		.then((result) => {
-			if (result) {
-				result.password = "";
-				return res.status(200).send( {user: result} );
-			} else {
-				return res.status(404).send({error: "User not found"});
-			}
-		})
-		.catch((error) => errorHandler(error, req, res));
+		if (!email.includes("@")) return res.status(400).send({ error: "Invalid email" });
+
+		const user = await User.findOne({ email });
+		if (!user) return res.status(404).send({ error: "No email found" });
+
+		const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+		if (!isPasswordCorrect) return res.status(401).send({ error: "Email and password do not match" });
+
+		const accessToken = auth.createAccessToken(user);
+		return res.status(200).send({ access: accessToken });
+	} catch (error) {
+		return errorHandler(error, req, res);
+	}
 };
 
-module.exports.resetPassword = (req, res) => {
-  const { newPassword } = req.body;
-  const { id } = req.user;
+module.exports.getProfile = async (req, res) => {
+	try {
+		const user = await User.findById(req.user.id);
+		if (!user) return res.status(404).send({ error: "User not found" });
 
-  bcrypt.hash(newPassword, 10)
-    .then((hashedPassword) => {
-      return User.findByIdAndUpdate(id, { password: hashedPassword });
-    })
-    .then(() => {
-      res.status(200).json({ message: 'Password reset successfully' });
-    })
-    .catch((error) => errorHandler(error, req, res));
+		user.password = undefined; // Remove password from response
+		return res.status(200).send({ user: user });
+	} catch (error) {
+		return errorHandler(error, req, res);
+	}
 };
 
+module.exports.resetPassword = async (req, res) => {
+	try {
+		const { newPassword } = req.body;
+		const { id } = req.user;
 
-module.exports.updateUserToAdmin = (req, res) => {
-  const { id } = req.params;
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		await User.findByIdAndUpdate(id, { password: hashedPassword });
 
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
+		return res.status(200).json({ message: 'Password reset successfully' });
+	} catch (error) {
+		return errorHandler(error, req, res);
+	}
+};
 
-      user.isAdmin = true;
+module.exports.updateUserToAdmin = async (req, res) => {
+	try {
+		const { id } = req.params;
 
-      return user.save();
-    })
-    .then((updatedUser) => {
-      res.status(200).send({
-        updatedUser: updatedUser,
-      });
-    })
-    .catch((error) => errorHandler(error, req, res));
+		const user = await User.findById(id);
+		if (!user) return res.status(404).send({ message: 'User not found' });
+
+		user.isAdmin = true;
+		const updatedUser = await user.save();
+
+		return res.status(200).send({ updatedUser: updatedUser });
+	} catch (error) {
+		return errorHandler(error, req, res);
+	}
 };

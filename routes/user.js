@@ -13,6 +13,6 @@ router.get("/details", verify, userController.getProfile)
 
 router.patch('/:id/set-as-admin', verifyToken, verifyAdmin, userController.updateUserToAdmin);
 
-router.put('/update-password', verify, userController.resetPassword);
+router.patch('/update-password', verify, userController.resetPassword);
 
 module.exports = router
