@@ -21,14 +21,14 @@
 ## Features by Student-1
 
 ### User Resources
-- **User Registration:** Allow new users to register.
-- **User Authentication:** Enable users to log in.
-- **Set User as Admin:** Admin can assign admin rights to users.
-- **Retrieve User Details:** Fetch details of the authenticated user.
-- **Update Password:** Allow users to change their passwords.
+- User Registration
+- User Authentication
+- Set User as Admin
+- Retrieve User Details
+- Update Password
 
 ### Product Resources
-- **Create Product (Admin Only):** Admin can create new product listings.
+- Create Product (Admin Only)
 
 ## Features by Student-2
 
