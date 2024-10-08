@@ -8,9 +8,9 @@ router.get("/all", verify, verifyAdmin, productController.getAllProducts);
 
 router.post("/", verify, verifyAdmin, productController.addProduct);
 
-router.post("/active", productController.getAllActive);
+router.get("/active", productController.getAllActive);
 
-router.get("/:productid", productController.getProduct);
+router.get("/:productId", productController.getProduct);
 
 router.patch(
 	"/:productId/activate",
