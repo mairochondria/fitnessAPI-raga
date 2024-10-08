@@ -23,12 +23,12 @@
 ### User Resources
 - User Registration
 - User Authentication
-- Set User as Admin
+- Set User as Admin (Admin only)
 - Retrieve User Details
 - Update Password
 
 ### Product Resources
-- Create Product (Admin Only)
+- Create Product (Admin only)
 
 ## Features by Student-2
 
@@ -44,4 +44,4 @@
 ### Order Resources:
 - Non-Admin User Checkout (Create Order)
 - Retrieve Authenticated User’s Orders
-- Retrieve All Orders (Admin Only)
+- Retrieve All Orders (Admin only)
