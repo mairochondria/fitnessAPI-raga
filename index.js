@@ -1,11 +1,8 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
-const passport = require("passport");
 const session = require("express-session");
-require('./passport.js');
 const userRoutes = require("./routes/user")
-const courseRoutes = require('./routes/course')
 
 const app = express()
 require('dotenv').config()
@@ -21,18 +18,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
-app.use(session({
-    secret: process.env.clientSecret,
-    resave: false,
-    saveUninitialized: false
-}));
-
-app.use(passport.initialize());
-
-app.use(passport.session());
-
 app.use('/users', userRoutes)
-app.use('/courses', courseRoutes)
 
 mongoose.connect(process.env.MONGODB_STRING)
 
