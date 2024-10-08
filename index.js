@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const cors = require("cors")
 const session = require("express-session");
 const userRoutes = require("./routes/user")
+const productRoutes = require('./routes/product')
 
 const app = express()
 require('dotenv').config()
@@ -19,6 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 app.use('/users', userRoutes)
+app.use('/products', productRoutes)
 
 mongoose.connect(process.env.MONGODB_STRING)
 
