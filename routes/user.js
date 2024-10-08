@@ -9,7 +9,7 @@ router.post("/register", userController.registerUser)
 
 router.post("/login", userController.loginUser)
 
-router.get("/details", verify, userController.getProfile)
+router.get("/details", verify, userController.getDetails)
 
 router.patch('/:id/set-as-admin', verifyToken, verifyAdmin, userController.updateUserToAdmin);
 

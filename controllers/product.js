@@ -16,9 +16,9 @@ module.exports.addProduct = (req, res) => {
 				return newProduct
 					.save()
 					.then((result) =>
-						res.status(201).send({
+						res.status(201).send(
 							result,
-						})
+						)
 					)
 					.catch((error) => errorHandler(error, req, res));
 			}
@@ -27,22 +27,22 @@ module.exports.addProduct = (req, res) => {
 };
 
 module.exports.getAllProducts = (req, res) => {
-	return Products.find({})
+	return Product.find({})
 		.then((result) => {
 			if (result.length === 0) {
 				return res.status(404).send({message: "No courses found"});
 			}
 
-			return res.status(200).send({result});
+			return res.status(200).send(result);
 		})
 		.catch((error) => errorHandler(error, req, res));
 };
 
 module.exports.getAllActive = (req, res) => {
-	return Products.find({isActive: true})
+	return Product.find({isActive: true})
 		.then((products) => {
 			if (products.length > 0) {
-				return res.status(200).send({products});
+				return res.status(200).send(products);
 			} else {
 				return res
 					.status(404)
@@ -58,7 +58,7 @@ module.exports.getProduct = (req, res) => {
 			if (!product) {
 				return res.status(404).send({message: "Course not found"});
 			} else {
-				return res.status(200).send({ course });
+				return res.status(200).send(product);
 			}
 		})
 		.catch((error) => errorHandler(error, req, res));

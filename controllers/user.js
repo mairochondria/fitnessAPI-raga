@@ -68,7 +68,7 @@ module.exports.loginUser = (req, res) => {
 };
 
 
-module.exports.getProfile = (req, res) => {
+module.exports.getDetails = (req, res) => {
 	return User.findById(req.user.id)
 		.then((result) => {
 			if (result) {
@@ -82,37 +82,55 @@ module.exports.getProfile = (req, res) => {
 };
 
 module.exports.resetPassword = (req, res) => {
-  const { newPassword } = req.body;
-  const { id } = req.user;
+	const { newPassword } = req.body;
+	const { id } = req.user;
 
-  bcrypt.hash(newPassword, 10)
-    .then((hashedPassword) => {
-      return User.findByIdAndUpdate(id, { password: hashedPassword });
-    })
-    .then(() => {
-      res.status(200).json({ message: 'Password reset successfully' });
-    })
-    .catch((error) => errorHandler(error, req, res));
+	bcrypt.hash(newPassword, 10)
+	    .then((hashedPassword) => {
+	        return User.findByIdAndUpdate(id, { password: hashedPassword });
+	    })
+	    .then(() => {
+	        res.status(200).json({ message: 'Password reset successfully' });
+	    })
+	    .catch((error) => errorHandler(error, req, res));
 };
 
 
 module.exports.updateUserToAdmin = (req, res) => {
-  const { id } = req.params;
+	const { id } = req.params;
 
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'User not found' });
-      }
+	User.findById(id)
+	.then((user) => {
+	    if (!user) {
+	        return res.status(404).send({ message: 'User not found' });
+	    }
 
-      user.isAdmin = true;
+	    user.isAdmin = true;
 
-      return user.save();
-    })
-    .then((updatedUser) => {
-      res.status(200).send({
-        updatedUser: updatedUser,
-      });
-    })
-    .catch((error) => errorHandler(error, req, res));
+	    return user.save();
+	    })
+	    .then((updatedUser) => {
+	    	res.status(200).send({
+	        updatedUser: updatedUser,
+	      });
+	    })
+	    .catch((error) => {
+	    	if (error.name === 'CastError') {
+	        return res.status(400).send({
+	            error: "Failed in Find",
+			        details: {
+			            stringValue: error.stringValue,
+			            valueType: typeof error.value,
+			            kind: error.kind,
+			            value: error.value,
+			            path: error.path,
+			            reason: error.reason || {},
+			            name: error.name,
+			            message: error.message
+	          		}
+	         	});
+	    	} else {
+	    		errorHandler(error, req, res);
+	    	}
+	    });
 };
