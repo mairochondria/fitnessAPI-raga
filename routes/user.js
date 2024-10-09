@@ -15,4 +15,4 @@ router.patch('/:id/set-as-admin', verifyToken, verifyAdmin, userController.updat
 
 router.patch('/update-password', verify, userController.resetPassword);
 
-module.exports = router
+module.exports = router;

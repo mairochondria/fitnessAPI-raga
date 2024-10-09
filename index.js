@@ -4,6 +4,7 @@ const cors = require("cors")
 const session = require("express-session");
 const userRoutes = require("./routes/user")
 const productRoutes = require('./routes/product')
+const cartRouter = require('./routes/cartRouter')
 
 const app = express()
 require('dotenv').config()
@@ -21,6 +22,7 @@ app.use(cors(corsOptions))
 
 app.use('/users', userRoutes)
 app.use('/products', productRoutes)
+app.use('/cart', cartRouter)
 
 mongoose.connect(process.env.MONGODB_STRING)
 
