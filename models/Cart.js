@@ -12,10 +12,6 @@ const cartItemSchema = new mongoose.Schema({
     subtotal: { 
         type: Number, 
         required: true 
-    },
-    orderedOn: { 
-        type: Date, 
-        default: Date.now 
     }
 });
 
@@ -29,6 +25,10 @@ const cartSchema = new mongoose.Schema({
     totalPrice: { 
         type: Number, 
         default: 0 
+    },
+    orderedOn: { 
+        type: Date, 
+        default: Date.now 
     }
 });
 

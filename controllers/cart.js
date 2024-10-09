@@ -4,10 +4,10 @@ const {errorHandler} = require("../auth");
 
 module.exports.addToCart = (req, res) => {
     const userId = req.user.id;
-    const { productId, quantity, subtotal } = req.body;
+    const { productId, productName, price, quantity, subtotal } = req.body;
 
-    if (!productId || !quantity || !subtotal) {
-        return res.status(400).json({ message: 'Product ID, quantity, and subtotal are required.' });
+    if (!productId || !productName || !price || !quantity || !subtotal) {
+        return res.status(400).json({ message: 'Product ID, Product name, price, quantity, and subtotal are required.' });
     }
 
     Cart.findOne({ userId })
@@ -37,9 +37,18 @@ module.exports.addToCart = (req, res) => {
         })
         .then((updatedCart) => {
 
+        	const responseCart = {
+                _id: updatedCart._id, // Move _id first
+                userId: updatedCart.userId,
+                cartItems: updatedCart.cartItems,
+                totalPrice: updatedCart.totalPrice,
+                orderedOn: updatedCart.orderedOn,
+                __v: updatedCart.__v
+            };
+
             return res.status(200).json({
                 message: 'Item added to cart successfully',
-                cart: updatedCart
+                cart: responseCart
             });
         })
         .catch((error) => errorHandler(error, req, res));
