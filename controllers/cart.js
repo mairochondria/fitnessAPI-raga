@@ -83,8 +83,67 @@ module.exports.getCart = (req, res) => {
     .catch((error) => errorHandler(error, req, res));
 };
 
+// module.exports.updateCartQuantity = (req, res) => {
+//     const userId = req.user.id; 
+
+//     Cart.findOne({ userId })
+//         .then(cart => {
+//             if (!cart) {
+//                 return res.status(404).json({ message: "Cart not found." });
+//             }
+
+//             const { productId, newQuantity } = req.body;
+
+//             return Product.findById(productId)
+//                 .then(product => {
+//                     if (!product) {
+//                         return res.status(404).json({ message: "Product not found." });
+//                     }
+
+// 		            const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);
+
+// 		            if (productIndex !== -1) {
+
+// 		                const item = cart.cartItems[productIndex];
+
+// 		                item.quantity = newQuantity;
+// 		                item.subtotal = item.price * newQuantity;
+// 		            } else {
+// 		                return res.status(404).json({ message: "Product not found in cart." });
+// 		            }
+
+// 		            cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
+		            
+// 		            return cart.save();
+// 		        });
+//         })
+//         .then(updatedCart => {
+
+//         	const responseCart = {
+//                 _id: updatedCart._id,
+//                 userId: updatedCart.userId,
+//                 cartItems: updatedCart.cartItems.map(item => ({
+//                     productId: item.productId,
+//                     quantity: item.quantity,
+//                     subtotal: item.subtotal,
+//                     _id: item._id // Include the item ID if needed
+//                 })),
+//                 totalPrice: updatedCart.totalPrice,
+//                 orderedOn: updatedCart.orderedOn,
+//                 __v: updatedCart.__v
+//             };
+
+
+//             res.status(200).json({ message: "Item quantity updated successfully", updatedCart: responseCart });
+//         })
+//         .catch(err => {
+//             res.status(500).json({ message: "An error occurred while updating the cart.", error: err.message });
+//         });
+// };
+
+
 module.exports.updateCartQuantity = (req, res) => {
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     Cart.findOne({ userId })
         .then(cart => {
@@ -94,47 +153,38 @@ module.exports.updateCartQuantity = (req, res) => {
 
             const { productId, newQuantity } = req.body;
 
-            return Product.findById(productId)
-                .then(product => {
-                    if (!product) {
-                        return res.status(404).json({ message: "Product not found." });
+            const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);
+
+            if (productIndex !== -1) {
+                const item = cart.cartItems[productIndex];
+
+                // Fetch the current price of the product
+                return Product.findById(productId).then(product => {
+                    if (!product || typeof product.price !== 'number' || isNaN(product.price)) {
+                        return res.status(400).json({ message: "Product price is not valid." });
                     }
 
-		            const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);
+                    // Use the fetched price to calculate the new subtotal
+                    const newPrice = product.price; // Fetch the latest price from the product
+                    item.quantity = newQuantity;
+                    const newSubtotal = newPrice * newQuantity;
+                    
+                    if (newSubtotal < 0) {
+                        return res.status(400).json({ message: "Subtotal cannot be negative." });
+                    }
+                    
+                    item.subtotal = newSubtotal;
 
-		            if (productIndex !== -1) {
-
-		                const item = cart.cartItems[productIndex];
-
-		                item.quantity = newQuantity;
-		                item.subtotal = item.price * newQuantity;
-		            } else {
-		                return res.status(404).json({ message: "Product not found in cart." });
-		            }
-
-		            cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
-		            
-		            return cart.save();
-		        });
+                    // Update total price of the cart
+                    cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
+                    return cart.save();
+                });
+            } else {
+                return res.status(404).json({ message: "Product not found in cart." });
+            }
         })
         .then(updatedCart => {
-
-        	const responseCart = {
-                _id: updatedCart._id,
-                userId: updatedCart.userId,
-                cartItems: updatedCart.cartItems.map(item => ({
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    subtotal: item.subtotal,
-                    _id: item._id // Include the item ID if needed
-                })),
-                totalPrice: updatedCart.totalPrice,
-                orderedOn: updatedCart.orderedOn,
-                __v: updatedCart.__v
-            };
-
-
-            res.status(200).json({ message: "Item quantity updated successfully", updatedCart: responseCart });
+            res.status(200).json({ message: "Item quantity updated successfully", updatedCart });
         })
         .catch(err => {
             res.status(500).json({ message: "An error occurred while updating the cart.", error: err.message });
