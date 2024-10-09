@@ -33,4 +33,8 @@ router.patch(
 	productController.updateProduct
 );
 
+router.post('/search-by-name', productController.searchProductsByName);
+
+router.post('/search-by-price', productController.searchProductsByPrice);
+
 module.exports = router;

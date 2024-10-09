@@ -126,3 +126,34 @@ module.exports.activateProduct = (req, res) => {
 		})
 		.catch((error) => errorHandler(error, req, res));
 };
+
+module.exports.searchProductsByName = (req, res) => {
+	const { name } = req.body;
+
+	Product.find({
+	    name: { $regex: name, $options: 'i' }
+	})
+	.then(products => {
+	    res.send(products);
+	})
+	.catch((error) => errorHandler(error, req, res));
+};
+
+module.exports.searchProductsByPrice = (req, res) => {
+	const { minPrice, maxPrice } = req.body;
+
+	if (typeof minPrice !== 'number' || typeof maxPrice !== 'number' || minPrice < 0 || maxPrice < 0 || minPrice > maxPrice) {
+	    return res.status(400).send({ error: 'Invalid price range.' });
+	  }
+
+	Product.find({
+	    price: { $gte: minPrice, $lte: maxPrice }
+	})
+	.then(products => {
+	    if (products.length === 0) {
+	        return res.status(404).send({ error: 'No products found within the specified price range.' });
+	    }
+	    return res.status(200).send(products);
+	})
+	.catch((error) => errorHandler(error, req, res));
+};
