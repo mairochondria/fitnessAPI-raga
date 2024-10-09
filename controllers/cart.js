@@ -2,7 +2,7 @@ const Cart = require("../models/Cart");
 const {errorHandler} = require("../auth");
 
 
-const addToCart = (req, res) => {
+module.exports.addToCart = (req, res) => {
     const userId = req.user.id;
     const { productId, quantity, subtotal } = req.body;
 

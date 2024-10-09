@@ -4,7 +4,7 @@ const cors = require("cors")
 const session = require("express-session");
 const userRoutes = require("./routes/user")
 const productRoutes = require('./routes/product')
-const cartRouter = require('./routes/cartRouter')
+const cartRouter = require('./routes/cart')
 
 const app = express()
 require('dotenv').config()
