@@ -7,7 +7,18 @@ module.exports.addToCart = (req, res) => {
     const { productId, productName, price, quantity, subtotal } = req.body;
 
     if (!productId || !productName || !price || !quantity || !subtotal) {
-        return res.status(400).json({ message: 'Product ID, Product name, price, quantity, and subtotal are required.' });
+        if (!productId || !productName || !price || !quantity || !subtotal) {
+        const missingFields = [];
+        if (!productId) missingFields.push('productId');
+        if (!productName) missingFields.push('productName');
+        if (!price) missingFields.push('price');
+        if (!quantity) missingFields.push('quantity');
+        if (!subtotal) missingFields.push('subtotal');
+
+        return res.status(400).json({ 
+            message: 'The following fields are required: ' + missingFields.join(', ') 
+        });
+    }
     }
 
     Cart.findOne({ userId })
