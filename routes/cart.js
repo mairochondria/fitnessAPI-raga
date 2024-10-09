@@ -7,8 +7,8 @@ const router = express.Router()
 
 router.post('/add-to-cart', verifyToken, cartController.addToCart);
 
-// router.get('/retrieve', verifyToken, cartController.getCart);
+router.get('/get-cart', verifyToken, cartController.getCart);
 
-// router.patch('/update-cart-quantity', verifyToken, cartController.updateCartQuantity);
+router.patch('/update-cart-quantity', verifyToken, cartController.updateCartQuantity);
 
 module.exports = router;

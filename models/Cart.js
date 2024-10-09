@@ -7,11 +7,15 @@ const cartItemSchema = new mongoose.Schema({
     },
     quantity: { 
         type: Number, 
+        required: true
+    },
+    price: { 
+        type: Number, 
         required: true 
     },
     subtotal: { 
         type: Number, 
-        required: true 
+        required: true
     }
 });
 
@@ -24,7 +28,7 @@ const cartSchema = new mongoose.Schema({
     cartItems: [cartItemSchema],
     totalPrice: { 
         type: Number, 
-        default: 0 
+        default: 0
     },
     orderedOn: { 
         type: Date, 
