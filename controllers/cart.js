@@ -1,24 +1,21 @@
 const Cart = require("../models/Cart");
+const Product = require("../models/Product");
 const {errorHandler} = require("../auth");
 
 
 module.exports.addToCart = (req, res) => {
     const userId = req.user.id;
-    const { productId, productName, price, quantity, subtotal } = req.body;
+    const { productId, quantity, subtotal } = req.body;
 
-    if (!productId || !productName || !price || !quantity || !subtotal) {
-        if (!productId || !productName || !price || !quantity || !subtotal) {
+    if (!productId || !quantity || !subtotal) {
         const missingFields = [];
         if (!productId) missingFields.push('productId');
-        if (!productName) missingFields.push('productName');
-        if (!price) missingFields.push('price');
         if (!quantity) missingFields.push('quantity');
         if (!subtotal) missingFields.push('subtotal');
 
         return res.status(400).json({ 
             message: 'The following fields are required: ' + missingFields.join(', ') 
         });
-    }
     }
 
     Cart.findOne({ userId })
@@ -37,10 +34,9 @@ module.exports.addToCart = (req, res) => {
 
                 cart.cartItems[existingProductIndex].quantity += quantity;
                 cart.cartItems[existingProductIndex].subtotal += subtotal;
-                cart.cartItems[existingProductIndex].price = price;
             } else {
 
-                cart.cartItems.push({ productId, quantity, price, subtotal });
+                cart.cartItems.push({ productId, quantity, subtotal });
             }
 
             cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
@@ -98,33 +94,28 @@ module.exports.updateCartQuantity = (req, res) => {
 
             const { productId, newQuantity } = req.body;
 
-            const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);
+            return Product.findById(productId)
+                .then(product => {
+                    if (!product) {
+                        return res.status(404).json({ message: "Product not found." });
+                    }
 
-            if (productIndex !== -1) {
+		            const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);
 
+		            if (productIndex !== -1) {
 
+		                const item = cart.cartItems[productIndex];
 
-                const item = cart.cartItems[productIndex];
+		                item.quantity = newQuantity;
+		                item.subtotal = item.price * newQuantity;
+		            } else {
+		                return res.status(404).json({ message: "Product not found in cart." });
+		            }
 
-                if (typeof item.price !== 'number' || isNaN(item.price)) {
-                    return res.status(400).json({ message: "Item price is not valid." });
-                }
-
-                // Log values for debugging
-                console.log('Price:', item.price);
-                item.quantity = newQuantity;
-                const newSubtotal = item.price * newQuantity;
-                if (newSubtotal < 0) {
-                    return res.status(400).json({ message: "Subtotal cannot be negative." });
-                }
-                item.subtotal = newSubtotal; 
-            } else {
-                return res.status(404).json({ message: "Product not found in cart." });
-            }
-
-            cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
-            
-            return cart.save();
+		            cart.totalPrice = cart.cartItems.reduce((acc, item) => acc + item.subtotal, 0);
+		            
+		            return cart.save();
+		        });
         })
         .then(updatedCart => {
 
