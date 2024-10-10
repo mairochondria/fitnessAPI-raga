@@ -24,7 +24,7 @@ app.use(cors(corsOptions))
 app.use('/users', userRoutes)
 app.use('/products', productRoutes)
 app.use('/cart', cartRoutes)
-app.use('/order', orderRoutes)
+app.use('/orders', orderRoutes)
 
 mongoose.connect(process.env.MONGODB_STRING)
 
