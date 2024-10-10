@@ -21,10 +21,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
-app.use('/users', userRoutes)
-app.use('/products', productRoutes)
-app.use('/cart', cartRoutes)
-app.use('/orders', orderRoutes)
+app.use('/b1/users', userRoutes)
+app.use('/b1/products', productRoutes)
+app.use('/b1/cart', cartRoutes)
+app.use('/b1/orders', orderRoutes)
 
 mongoose.connect(process.env.MONGODB_STRING)
 
