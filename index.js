@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 const corsOptions = {
-    origin: ['http://localhost:8000', 'http://ec2-3-16-152-230.us-east-2.compute.amazonaws.com'],
+    origin: ['http://localhost:8000'],
     credentials: true,
     optionsSuccessStatus: 200,
 }
