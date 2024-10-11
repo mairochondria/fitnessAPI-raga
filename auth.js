@@ -12,31 +12,6 @@ module.exports.createAccessToken = (user) => {
     return jwt.sign(data, process.env.JWT_SECRET_KEY, {})
 }
 
-module.exports.verifyToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).send({
-      auth: 'Failed',
-      message: 'No token provided',
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-    req.user = decoded;
-
-    next();
-  } catch (error) {
-    return res.status(401).send({
-      auth: 'Failed',
-      message: 'Invalid token',
-      error: error.message,
-    });
-  }
-};
-
 module.exports.verify = (req, res, next) => {
     console.log(req.headers.authorization)
 
@@ -66,6 +41,31 @@ module.exports.verify = (req, res, next) => {
         })
     }
 }
+
+module.exports.verifyToken = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).send({
+      auth: 'Failed',
+      message: 'No token provided',
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    return res.status(401).send({
+      auth: 'Failed',
+      message: 'Invalid token',
+      error: error.message,
+    });
+  }
+};
 
 module.exports.verifyAdmin = (req, res, next) => {
     
