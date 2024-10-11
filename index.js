@@ -19,7 +19,7 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 }
 
-app.use(cors(corsOptions))
+app.use(cors(corsOptions))  
 
 app.use('/b1/users', userRoutes);
 app.use('/b1/products', productRoutes);
