@@ -21,17 +21,17 @@ const corsOptions = {
 
 app.use(cors(corsOptions))  
 
-app.use('/b1/users', userRoutes);
-app.use('/b1/products', productRoutes);
-app.use('/b1/cart', cartRoutes);
-app.use('/b1/orders', orderRoutes);
-
 mongoose.connect(process.env.MONGODB_STRING)
 
 const db = mongoose.connection
 
 db.on('error', console.error.bind(console, 'connection error'))
 db.once('open', () => console.log("Now connected to MongoDB Atlas"))
+
+app.use('/b1/users', userRoutes);
+app.use('/b1/products', productRoutes);
+app.use('/b1/cart', cartRoutes);
+app.use('/b1/orders', orderRoutes);
 
 if (require.main === module) {
     app.listen(process.env.PORT, () => console.log(`Server running at port ${process.env.PORT}`))
