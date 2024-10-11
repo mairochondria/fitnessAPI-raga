@@ -9,6 +9,6 @@ router.post('/checkout', verify, orderController.checkoutOrder);
 
 router.get('/my-orders', verify, orderController.getMyOrders);
 
-router.get('/all-orders', verify, verifyToken, verifyAdmin, orderController.getAllOrders);
+router.get('/all-orders', verifyToken, verifyAdmin, orderController.getAllOrders);
 
 module.exports = router;
