@@ -25,8 +25,7 @@ module.exports.registerUser = (req, res) => {
 		lastName: req.body.lastName,
 		email: req.body.email,
 		mobileNo: req.body.mobileNo,
-		password: bcrypt.hashSync(req.body.password, 10),
-		isAdmin: req.body.isAdmin,
+		password: bcrypt.hashSync(req.body.password, 10)
 	});
 
 	newUser
