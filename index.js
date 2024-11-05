@@ -3,9 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
 const userRoutes = require('./routes/user');
-const productRoutes = require('./routes/product');
-const cartRoutes = require('./routes/cart');
-const orderRoutes = require('./routes/order');
+const workoutRoutes = require('./routes/workout');
 
 const app = express();
 require('dotenv').config();
@@ -14,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 const corsOptions = {
-    origin: ['http://localhost:8000', 'http://localhost:3000', 'http://zuitt-bootcamp-prod-481-7968-raga.s3-website.us-east-1.amazonaws.com', 'http://zuitt-bootcamp-prod-481-8079-dino.s3-website.us-east-1.amazonaws.com'],
+    origin: ['http://localhost:8000', 'http://localhost:3000'],
     credentials: true,
     optionsSuccessStatus: 200,
 }
@@ -28,13 +26,13 @@ const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error'))
 db.once('open', () => console.log("Now connected to MongoDB Atlas"))
 
-app.use('/b1/users', userRoutes);
-app.use('/b1/products', productRoutes);
-app.use('/b1/cart', cartRoutes);
-app.use('/b1/orders', orderRoutes);
+app.use("/workouts", workoutRoutes);
+app.use("/users", userRoutes);
 
-if (require.main === module) {
-    app.listen(process.env.PORT, () => console.log(`Server running at port ${process.env.PORT}`))
+if(require.main === module){
+    app.listen(process.env.PORT || 4000, () => {
+        console.log(`API is now online on port ${ process.env.PORT || 4000 }`)
+    });
 }
 
-module.exports = {app, mongoose}
+module.exports = {app,mongoose};

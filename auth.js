@@ -4,9 +4,8 @@ require("dotenv").config()
 
 module.exports.createAccessToken = (user) => {
     const data = {
-        id: user._id,
+        _id: user._id,
         email: user.email,
-        isAdmin: user.isAdmin
     }
 
     return jwt.sign(data, process.env.JWT_SECRET_KEY, {})
@@ -34,54 +33,15 @@ module.exports.verify = (req, res, next) => {
                 console.log("result from verify method:");
                 console.log(decodedToken);
 
-                req.user = decodedToken
+                req.user = {
+                    _id: decodedToken._id,
+                    email: decodedToken.email
+                };
 
                 next()
             }
         })
     }
-}
-
-module.exports.verifyToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).send({
-      auth: 'Failed',
-      message: 'No token provided',
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-    req.user = decoded;
-
-    next();
-  } catch (error) {
-    return res.status(401).send({
-      auth: 'Failed',
-      message: 'Invalid token',
-      error: error.message,
-    });
-  }
-};
-
-module.exports.verifyAdmin = (req, res, next) => {
-    
-    if(req.user && req.user.isAdmin) {
-
-        next();
-
-    } 
-    else {
-        return res.status(403).send({
-            auth: "Failed",
-            message: "Action Forbidden"
-
-        })
-    }
-
 }
 
 
@@ -93,7 +53,7 @@ module.exports.errorHandler = (err, req, res, next) => {
 
     res.status(statusCode).json({
         error: {
-            meesage: errorMessage,
+            message: errorMessage,
             errorCode: err.code || 'SERVER ERROR',
             details: err.details || null
         }
